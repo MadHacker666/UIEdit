@@ -16,10 +16,18 @@ namespace UIEdit.Controllers {
             var showDialog = dlg.ShowDialog();
             if (showDialog == null || !((bool) showDialog)) return;
             InterfacesPath = dlg.SelectedPath;
+            Properties.Settings.Default.interfaceFilePath = InterfacesPath;
+            Properties.Settings.Default.Save();
             //InterfacesPath = @"B:\DEV\UIEdit\UIEdit\bin\Debug\interfaces.pck.files";
+            GenerateFileList();
+        }
+
+        private void GenerateFileList()
+        {
             Files = new List<SourceFile>();
-            foreach (var file in Directory.GetFiles(InterfacesPath, "*.xml", SearchOption.AllDirectories)) {
-                Files.Add(new SourceFile { FileName = file, ProjectPath = InterfacesPath});
+            foreach (var file in Directory.GetFiles(InterfacesPath, "*.xml", SearchOption.AllDirectories))
+            {
+                Files.Add(new SourceFile { FileName = file, ProjectPath = InterfacesPath });
             }
         }
 
@@ -28,6 +36,8 @@ namespace UIEdit.Controllers {
             var showDialog = dlg.ShowDialog();
             if (showDialog == null || !((bool) showDialog)) return;
             SurfacesPath = dlg.SelectedPath;
+            Properties.Settings.Default.surfaceFilePath = SurfacesPath;
+            Properties.Settings.Default.Save();
             //SurfacesPath = @"B:\DEV\UIEdit\UIEdit\bin\Debug\surfaces.pck.files";
         }
 
@@ -67,6 +77,18 @@ namespace UIEdit.Controllers {
 
         private string UnsafeXml(string xml) {
             return xml.Replace("###LeftArrow###", "<").Replace("###RightArrow###", ">");
+        }
+
+        public void LoadLastState()
+        {
+            if (Properties.Settings.Default.surfaceFilePath.Length > 0)
+                SurfacesPath = Properties.Settings.Default.surfaceFilePath;
+            if (Properties.Settings.Default.interfaceFilePath.Length > 0)
+            {
+                InterfacesPath = Properties.Settings.Default.interfaceFilePath;
+                GenerateFileList();
+            }
+
         }
     }
 }

@@ -14,39 +14,46 @@ namespace UIEdit.Windows {
         public ProjectController ProjectController { get; set; }
         public SourceFile CurrentSourceFile { get; set; }
         public LayoutController LayoutController { get; set; }
-        public AvalonEditorSearchController TextSearchController { get; set; }
+        //public AvalonEditorSearchController TextSearchController { get; set; }
 
         public MainWindow() {
             InitializeComponent();
             Dispatcher.UnhandledException += ApplicationOnDispatcherUnhandledException;
             ProjectController = new ProjectController();
             LayoutController = new LayoutController();
-            TextSearchController = new AvalonEditorSearchController(TeFile);
+            //TextSearchController = new AvalonEditorSearchController(TeFile);
             LbDialogs.SelectionChanged += LbDialogsOnSelectionChanged;
             TeFile.TextChanged += TeFileOnTextChanged;
             TxtSearch.TextChanged += TxtSearchOnTextChanged;
-            TbSearchInText.TextChanged += TbSearchInTextOnTextChanged;
-            TbSearchInText.PreviewKeyDown += TbSearchInTextOnPreviewKeyDown;
+            //TbSearchInText.TextChanged += TbSearchInTextOnTextChanged;
+            //TbSearchInText.PreviewKeyDown += TbSearchInTextOnPreviewKeyDown;
+
+
+            ProjectController.LoadLastState();
+
+            TbInterfacesPath.Text = ProjectController.InterfacesPath;
+            LbDialogs.ItemsSource = ProjectController.Files;
+            TbSurfacesPath.Text = ProjectController.SurfacesPath;
         }
 
-        private void TbSearchInTextOnPreviewKeyDown(object sender, KeyEventArgs e) {
-            if (e.Key == Key.Up)
-                TextSearchController.PrevSearch(TbSearchInText.Text);
-            if (e.Key == Key.Down)
-                TextSearchController.NextSearch(TbSearchInText.Text);
-        }
-
-        private void TbSearchInTextOnTextChanged(object sender, TextChangedEventArgs e) {
-            TextSearchController.NextSearch(TbSearchInText.Text);
-        }
-
-        private void BtnSearchPrevTextFragment_OnClick(object sender, RoutedEventArgs e) {
-            TextSearchController.PrevSearch(TbSearchInText.Text);
-        }
-
-        private void BtnSearchNextTextFragment_OnClick(object sender, RoutedEventArgs e) {
-            TextSearchController.NextSearch(TbSearchInText.Text);
-        }
+      //private void TbSearchInTextOnPreviewKeyDown(object sender, KeyEventArgs e) {
+      //    if (e.Key == Key.Up)
+      //        TextSearchController.PrevSearch(TbSearchInText.Text);
+      //    if (e.Key == Key.Down)
+      //        TextSearchController.NextSearch(TbSearchInText.Text);
+      //}
+      //
+      //private void TbSearchInTextOnTextChanged(object sender, TextChangedEventArgs e) {
+      //    TextSearchController.NextSearch(TbSearchInText.Text);
+      //}
+      //
+      //private void BtnSearchPrevTextFragment_OnClick(object sender, RoutedEventArgs e) {
+      //    TextSearchController.PrevSearch(TbSearchInText.Text);
+      //}
+      //
+      //private void BtnSearchNextTextFragment_OnClick(object sender, RoutedEventArgs e) {
+      //    TextSearchController.NextSearch(TbSearchInText.Text);
+      //}
 
         private void ApplicationOnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
             File.AppendAllText("error.log", string.Format(@"{0} {1} {2}{4}{3}{4}{4}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), e.Exception, e.Exception.Message, e.Exception.StackTrace, Environment.NewLine));
@@ -71,7 +78,7 @@ namespace UIEdit.Windows {
 
         private void TeFileOnTextChanged(object sender, EventArgs e) {
             LockEditor(TeFile.IsModified);
-            TextSearchController.Reset();
+            //TextSearchController.Reset();
             var exceptionParse = LayoutController.Parse(TeFile.Text, ProjectController.SurfacesPath);
             if (exceptionParse == null)
                 LayoutController.RefreshLayout(DialogCanvas);
@@ -129,5 +136,17 @@ namespace UIEdit.Windows {
         private void BtnGotoGithub_OnClick(object sender, RoutedEventArgs e) {
             System.Diagnostics.Process.Start("https://github.com/perfectdev/UIEdit");
         }
+
+        private void BtnFind_Click(object sender, RoutedEventArgs e)
+        {
+            FindReplace.FindReplaceDialog.ShowForReplace(TeFile, true);
+        }
+
+
+        private void BtnReplace_Click(object sender, RoutedEventArgs e)
+        {
+            FindReplace.FindReplaceDialog.ShowForReplace(TeFile, false);
+        }
+
     }
 }
